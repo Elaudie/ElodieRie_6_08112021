@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const thingSchema = mongoose.Schema({
     userId: { type: String, required: true },
@@ -8,10 +9,10 @@ const thingSchema = mongoose.Schema({
     mainPepper: { type: String, required: true },
     imageUrl: { type: String, required: true },
     heat: { type: Number, required: true },
-    likes: { type: Number, required: false },
-    dislikes: { type: Number, required: false },
-    usersLiked: { type: String, required: false },
-    usersDisliked: { type: String, required: false }
+    likes: { type: Number, default:0, required: false },
+    dislikes: { type: Number, default:0, required: false },
+    usersLiked: [{ type: Schema.Types.ObjectId, ref: 'User'}], 
+    usersDisliked: [{ type: Schema.Types.ObjectId, ref: 'User'}]
   });
 
 module.exports = mongoose.model('Thing', thingSchema);

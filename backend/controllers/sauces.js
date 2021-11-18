@@ -17,7 +17,7 @@ exports.createThing = (req, res, next) => {
 exports.modifyThing = (req, res, next) => {
     const thingObject = req.file ?
         {
-          ...JSON.parse(req.body.thing),
+          ...JSON.parse(req.body.sauce),
           imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`  
          } : { ...req.body };
     Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
@@ -58,25 +58,25 @@ exports.likeOrDislikeSauce = (req, res, next) => {
 
     switch (like) {
         case 1:
-            Sauce.updateOne({ _id: sauceId }, { $push:{ usersLiked: userId }, $inc:{ likes: +1 } })
+            Thing.updateOne({ _id: sauceId }, { $push:{ usersLiked: userId }, $inc:{ likes: 1 } })
                 .then(()=> res.status(200).json({ message: 'Like ajouté !'}))
                 .catch(error => res.status(400).json({ error }))
             break;
         case -1:
-            Sauce.updateOne({ _id: sauceId }, { $push:{ usersDisliked: userId }, $inc:{ dislikes: +1 } })
+            Thing.updateOne({ _id: sauceId }, { $push:{ usersDisliked: userId }, $inc:{ dislikes: 1 } })
                 .then(()=> res.status(200).json({ message: 'Dislike ajouté !'}))
                 .catch(error => res.status(400).json({ error }))
             break;
         case 0:
-            Sauce.findOne({ _id: sauceId })
+            Thing.findOne({ _id: sauceId })
                 .then((sauce) => {
                     if (sauce.usersLiked.includes(userId)) {
-                        Sauce.updateOne({ _id: sauceId }, { $pull:{ usersLiked: userId }, $inc:{ likes: -1 } })
+                        Thing.updateOne({ _id: sauceId }, { $pull:{ usersLiked: userId }, $inc:{ likes: -1 } })
                             .then(()=> res.status(200).json({ message: 'Like annulé !'}))
                             .catch(error => res.status(400).json({ error }));
                     }
-                    if (sauce.usersDisliked.includes(userId)) {
-                        Sauce.updateOne({ _id: sauceId }, { $pull:{ usersDisliked: userId }, $inc:{ dislikes: -1 } })
+                    else if (sauce.usersDisliked.includes(userId)) {
+                        Thing.updateOne({ _id: sauceId }, { $pull:{ usersDisliked: userId }, $inc:{ dislikes: -1 } })
                             .then(()=> res.status(200).json({ message: 'Dislike annulé !'}))
                             .catch(error => res.status(400).json({ error }));
                     }
